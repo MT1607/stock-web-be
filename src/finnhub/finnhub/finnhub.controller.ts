@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FinnhubService } from './finnhub.service';
-import { Stock } from 'src/types';
+import { ResponseListStock, Stock } from 'src/types';
 
 @ApiTags('Finnhub')
 @Controller('stock')
@@ -40,7 +40,7 @@ export class FinnhubController {
     @Query('exchange') exchange: string = 'US',
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 20,
-  ): Promise<Stock[]> {
+  ): Promise<ResponseListStock> {
     return this.finnhubService.getAllStock(exchange, page, limit);
   }
 }

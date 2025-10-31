@@ -43,3 +43,10 @@ export interface SearchStock {
   count: number;
   result: Stock[];
 }
+
+export interface ResponseListStock {
+  dataJson: Stock[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+}

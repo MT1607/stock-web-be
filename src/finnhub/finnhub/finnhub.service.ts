@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import * as process from 'node:process';
 import { firstValueFrom } from 'rxjs';
-import { Stock } from 'src/types';
+import { ResponseListStock, Stock } from 'src/types';
 import WebSocket from 'ws';
 
 @Injectable()
@@ -77,7 +77,7 @@ export class FinnhubService {
     exchange: string,
     page: number = 1,
     limit: number = 20,
-  ): Promise<Stock[]> {
+  ): Promise<ResponseListStock> {
     const url = `${this.finnhub_base_url}/stock/symbol`;
 
     const response = await firstValueFrom(
@@ -93,7 +93,14 @@ export class FinnhubService {
     const endIndex = page * limit;
 
     const paginationData = result.slice(startIndex, endIndex);
+    const total = result.length;
+    const totalPage = Math.ceil(result.length / limit);
 
-    return paginationData;
+    return {
+      dataJson: paginationData,
+      totalItems: total,
+      totalPages: totalPage,
+      currentPage: page,
+    };
   }
 }
