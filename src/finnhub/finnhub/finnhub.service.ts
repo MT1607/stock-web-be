@@ -1,16 +1,22 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import * as process from 'node:process';
+import { firstValueFrom } from 'rxjs';
+import { Stock } from 'src/types';
 import WebSocket from 'ws';
 
 @Injectable()
 export class FinnhubService {
   private readonly logger = new Logger(FinnhubService.name);
+  private readonly api_key = process.env.FINNHUB_API_KEY;
+  private readonly finnhub_base_url = process.env.FINNHUB_BASE_URL;
   private finnhubWs: WebSocket;
 
-  constructor() {
+  constructor(private readonly httpService: HttpService) {
     this.connectFinnhub();
   }
 
+  // WebSocket Finnhub
   private connectFinnhub() {
     const key = process.env.FINNHUB_API_KEY;
     const url = process.env.FINNHUB_WS_URL;
@@ -64,5 +70,30 @@ export class FinnhubService {
 
       callback(text);
     });
+  }
+
+  // Rest API
+  async getAllStock(
+    exchange: string,
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<Stock[]> {
+    const url = `${this.finnhub_base_url}/stock/symbol`;
+
+    const response = await firstValueFrom(
+      this.httpService.get<Stock[]>(url, {
+        params: { exchange },
+        headers: { 'X-Finnhub-Token': this.api_key },
+      }),
+    );
+
+    const result = response?.data;
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const paginationData = result.slice(startIndex, endIndex);
+
+    return paginationData;
   }
 }
