@@ -4,7 +4,7 @@ import { FinnhubService } from './finnhub.service';
 import { Stock } from 'src/types';
 
 @ApiTags('Finnhub')
-@Controller()
+@Controller('stock')
 export class FinnhubController {
   constructor(private readonly finnhubService: FinnhubService) {}
 
