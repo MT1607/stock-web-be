@@ -6,11 +6,16 @@ import { DatabaseService } from './database/database.service';
 import { DatabaseModule } from './database/database.module';
 import { FinnhubController } from './finnhub/finnhub/finnhub.controller';
 import { HttpModule } from '@nestjs/axios';
+import { CacheModule } from '@nestjs/cache-manager';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     HttpModule,
+    CacheModule.register({
+      ttl: 86400 * 1000,
+      max: 10,
+    }),
   ],
   controllers: [FinnhubController],
   providers: [

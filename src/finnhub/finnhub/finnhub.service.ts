@@ -1,9 +1,13 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as process from 'node:process';
 import { firstValueFrom } from 'rxjs';
 import { ResponseListStock, Stock } from 'src/types';
 import WebSocket from 'ws';
+import { Cache } from '@nestjs/cache-manager';
+
+const CACHE_KEY_ALL_STOCKS = 'all_stocks';
 
 @Injectable()
 export class FinnhubService {
@@ -12,7 +16,10 @@ export class FinnhubService {
   private readonly finnhub_base_url = process.env.FINNHUB_BASE_URL;
   private finnhubWs: WebSocket;
 
-  constructor(private readonly httpService: HttpService) {
+  constructor(
+    private readonly httpService: HttpService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {
     this.connectFinnhub();
   }
 
@@ -78,16 +85,34 @@ export class FinnhubService {
     page: number = 1,
     limit: number = 20,
   ): Promise<ResponseListStock> {
-    const url = `${this.finnhub_base_url}/stock/symbol`;
-
-    const response = await firstValueFrom(
-      this.httpService.get<Stock[]>(url, {
-        params: { exchange },
-        headers: { 'X-Finnhub-Token': this.api_key },
-      }),
+    const cached = await this.cacheManager.get<Stock[]>(
+      CACHE_KEY_ALL_STOCKS + '_' + exchange,
     );
 
-    const result = response?.data;
+    let result: Stock[];
+
+    if (!cached) {
+      this.logger.warn('Cache miss: Fetching all stocks from Finnhub...');
+      const url = `${this.finnhub_base_url}/stock/symbol`;
+
+      const response = await firstValueFrom(
+        this.httpService.get<Stock[]>(url, {
+          params: { exchange },
+          headers: { 'X-Finnhub-Token': this.api_key },
+        }),
+      );
+
+      result = response?.data ?? [];
+
+      await this.cacheManager.set(
+        CACHE_KEY_ALL_STOCKS + '_' + exchange,
+        result,
+        86400 * 1000,
+      );
+    } else {
+      this.logger.warn('Cache: Using stocks from cache');
+      result = cached;
+    }
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
