@@ -1,14 +1,14 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FinnhubService } from './finnhub.service';
-import { ResponseListStock, Stock } from 'src/types';
+import { ResponseListStock, SearchStock, Stock } from 'src/types';
 
 @ApiTags('Finnhub')
-@Controller('stock')
+@Controller()
 export class FinnhubController {
   constructor(private readonly finnhubService: FinnhubService) {}
 
-  @Get()
+  @Get('stock')
   @ApiOperation({ summary: 'Get all stocks from an exchange' })
   @ApiQuery({
     name: 'exchange',
@@ -42,5 +42,32 @@ export class FinnhubController {
     @Query('limit') limit: number = 20,
   ): Promise<ResponseListStock> {
     return this.finnhubService.getAllStock(exchange, page, limit);
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: 'Get stock by search' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    type: String,
+    description: 'Symbol or company name',
+    example: 'AAPL',
+  })
+  @ApiQuery({
+    name: 'exchange',
+    required: false,
+    type: String,
+    description: 'Exchange code (default:US)',
+    example: 'US',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved stock',
+  })
+  async searchStock(
+    @Query('q') q: string = 'AAPL',
+    @Query('exchange') exchange: string = 'US',
+  ): Promise<SearchStock> {
+    return this.finnhubService.searchStock(exchange, q);
   }
 }
