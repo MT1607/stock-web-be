@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FinnhubService } from './finnhub.service';
-import { ResponseListStock, SearchStock, Stock } from 'src/types';
+import { QuoteStock, ResponseListStock, SearchStock, Stock } from 'src/types';
 
 @ApiTags('Finnhub')
 @Controller()
@@ -69,5 +69,19 @@ export class FinnhubController {
     @Query('exchange') exchange: string = 'US',
   ): Promise<SearchStock> {
     return this.finnhubService.searchStock(exchange, q);
+  }
+
+  @Get('quote')
+  @ApiOperation({ summary: 'Get quote of stock' })
+  @ApiQuery({
+    name: 'symbol',
+    required: true,
+    type: String,
+    example: 'AAPL',
+  })
+  async getQuoteStock(
+    @Query('symbol') symbol: string = 'AAPL',
+  ): Promise<QuoteStock> {
+    return this.finnhubService.getQuoteStock(symbol);
   }
 }

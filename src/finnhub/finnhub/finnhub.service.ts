@@ -3,7 +3,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as process from 'node:process';
 import { firstValueFrom } from 'rxjs';
-import { ResponseListStock, SearchStock, Stock } from 'src/types';
+import { QuoteStock, ResponseListStock, SearchStock, Stock } from 'src/types';
 import WebSocket from 'ws';
 import { Cache } from '@nestjs/cache-manager';
 
@@ -147,6 +147,20 @@ export class FinnhubService {
       }),
     );
 
+    return response.data;
+  }
+
+  async getQuoteStock(symbol: string): Promise<QuoteStock> {
+    const url = `${this.finnhub_base_url}/quote`;
+
+    const response = await firstValueFrom(
+      this.httpService.get<QuoteStock>(url, {
+        params: { symbol },
+        headers: { 'X-Finnhub-Token': this.api_key },
+      }),
+    );
+
+    this.logger.log('data quote: ', response);
     return response.data;
   }
 }

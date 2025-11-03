@@ -39,6 +39,23 @@ export class Stock {
   symbol2: string;
 }
 
+export class QuoteStock {
+  @ApiProperty({ description: 'Current Price' })
+  c: number;
+  @ApiProperty({ description: 'Change' })
+  d: number;
+  @ApiProperty({ description: 'Percent change' })
+  dp: number;
+  @ApiProperty({ description: 'High price of the day' })
+  h: number;
+  @ApiProperty({ description: 'Low price of the day' })
+  l: number;
+  @ApiProperty({ description: 'Open price of the day' })
+  o: number;
+  @ApiProperty({ description: 'Previous close the price' })
+  pc: number;
+}
+
 export interface SearchStock {
   count: number;
   result: Stock[];
