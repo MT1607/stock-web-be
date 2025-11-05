@@ -56,6 +56,20 @@ export class QuoteStock {
   pc: number;
 }
 
+export class MarketStatus {
+  @ApiProperty({ description: 'Exchange' })
+  exchange: string;
+  @ApiProperty({ description: 'Holiday event' })
+  holiday: object;
+  @ApiProperty({ description: 'Status of the market' })
+  isOpen: boolean;
+  @ApiProperty({ description: 'High price of the day' })
+  session: 'pre-market' | 'regular' | 'post-market' | null;
+  @ApiProperty({ description: 'Current timestamp' })
+  t: Date;
+  @ApiProperty({ description: 'Timezone' })
+  timezone: string;
+}
 export interface SearchStock {
   count: number;
   result: Stock[];

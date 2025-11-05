@@ -1,7 +1,13 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FinnhubService } from './finnhub.service';
-import { QuoteStock, ResponseListStock, SearchStock, Stock } from 'src/types';
+import {
+  MarketStatus,
+  QuoteStock,
+  ResponseListStock,
+  SearchStock,
+  Stock,
+} from 'src/types';
 
 @ApiTags('Finnhub')
 @Controller()
@@ -84,5 +90,18 @@ export class FinnhubController {
   ): Promise<QuoteStock> {
     const upperCaseSymbol = symbol.toUpperCase();
     return this.finnhubService.getQuoteStock(upperCaseSymbol);
+  }
+  @Get('market-status')
+  @ApiOperation({ summary: 'Get market status' })
+  @ApiQuery({
+    name: 'exchange',
+    required: true,
+    type: String,
+    example: 'US',
+  })
+  async getStatusMarket(
+    @Query('exchange') exchange: string = 'US',
+  ): Promise<MarketStatus> {
+    return this.finnhubService.getStatusMarket(exchange);
   }
 }

@@ -3,7 +3,13 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as process from 'node:process';
 import { firstValueFrom } from 'rxjs';
-import { QuoteStock, ResponseListStock, SearchStock, Stock } from 'src/types';
+import {
+  MarketStatus,
+  QuoteStock,
+  ResponseListStock,
+  SearchStock,
+  Stock,
+} from 'src/types';
 import WebSocket from 'ws';
 import { Cache } from '@nestjs/cache-manager';
 
@@ -155,6 +161,18 @@ export class FinnhubService {
     const response = await firstValueFrom(
       this.httpService.get<QuoteStock>(url, {
         params: { symbol },
+        headers: { 'X-Finnhub-Token': this.api_key },
+      }),
+    );
+
+    return response.data;
+  }
+
+  async getStatusMarket(exchange: string): Promise<MarketStatus> {
+    const url = `${this.finnhub_base_url}/stock/market-status`;
+    const response = await firstValueFrom(
+      this.httpService.get<MarketStatus>(url, {
+        params: { exchange },
         headers: { 'X-Finnhub-Token': this.api_key },
       }),
     );
