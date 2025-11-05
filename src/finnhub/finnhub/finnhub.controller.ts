@@ -82,6 +82,7 @@ export class FinnhubController {
   async getQuoteStock(
     @Query('symbol') symbol: string = 'AAPL',
   ): Promise<QuoteStock> {
-    return this.finnhubService.getQuoteStock(symbol);
+    const upperCaseSymbol = symbol.toUpperCase();
+    return this.finnhubService.getQuoteStock(upperCaseSymbol);
   }
 }

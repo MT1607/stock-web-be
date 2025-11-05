@@ -152,7 +152,6 @@ export class FinnhubService {
 
   async getQuoteStock(symbol: string): Promise<QuoteStock> {
     const url = `${this.finnhub_base_url}/quote`;
-
     const response = await firstValueFrom(
       this.httpService.get<QuoteStock>(url, {
         params: { symbol },
@@ -160,7 +159,6 @@ export class FinnhubService {
       }),
     );
 
-    this.logger.log('data quote: ', response);
     return response.data;
   }
 }
