@@ -7,6 +7,8 @@ import { DatabaseModule } from './database/database.module';
 import { FinnhubController } from './finnhub/finnhub/finnhub.controller';
 import { HttpModule } from '@nestjs/axios';
 import { CacheModule } from '@nestjs/cache-manager';
+import { MassiveClientService } from './massive/massive-client.service';
+import { MassiveClientGateway } from './massive/massive-client.gateway';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -23,6 +25,8 @@ import { CacheModule } from '@nestjs/cache-manager';
     StockQuoteDataGateway,
     DatabaseService,
     FinnhubService,
+    MassiveClientGateway,
+    MassiveClientService,
   ],
 })
 export class AppModule {}

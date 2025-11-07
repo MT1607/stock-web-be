@@ -75,6 +75,25 @@ export interface SearchStock {
   result: Stock[];
 }
 
+export interface MassiveResponse {
+  ev: 'AM' | 'A' | 'status';
+  sym: string;
+  v: number;
+  av: number;
+  op: number;
+  vw: number;
+  o: number;
+  c: number;
+  h: number;
+  l: number;
+  a: number;
+  z: number;
+  s: number;
+  e: number;
+  otc: boolean;
+  status: string;
+}
+
 export interface ResponseListStock {
   dataJson: Stock[];
   totalItems: number;
