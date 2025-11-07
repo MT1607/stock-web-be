@@ -41,15 +41,16 @@ export class MassiveClientService implements OnModuleInit {
 
   private handleMessage(data: WebSocket.Data) {
     try {
-      console.log('massive data: ', data);
-      const message = JSON.parse(data.toString()) as MassiveResponse;
-      console.log('message: ', message);
-      if (message.ev === 'status' && message.status === 'auth_success') {
-        this.authenticated = true;
-        this.logger.log('Authenticated success');
+      if (Buffer.isBuffer(data)) {
+        const message = JSON.parse(data.toString()) as MassiveResponse;
+        console.log('message: ', message);
+        if (message.ev === 'status' && message.status === 'auth_success') {
+          this.authenticated = true;
+          this.logger.log('Authenticated success');
+        }
+        this.logger.debug(`Massive Data: ${message.ev} @ ${message.sym}`);
+        this.massiveGateway.sendToClient(message);
       }
-      this.logger.debug(`Massive Data: ${message.ev} @ ${message.sym}`);
-      this.massiveGateway.sendToClient(message);
     } catch (e) {
       this.logger.error('Failed to parse Massive API message: ', e);
     }
